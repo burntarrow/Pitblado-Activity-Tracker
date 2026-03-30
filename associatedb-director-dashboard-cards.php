@@ -9,6 +9,287 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! function_exists( 'pitblado_director_dashboard_get_range_context' ) ) {
+	function pitblado_director_dashboard_get_range_context() {
+		$range_key = isset( $_GET['range'] ) ? sanitize_key( wp_unslash( $_GET['range'] ) ) : '30d';
+
+		$ranges = array(
+			'30d'         => 'Last 30 Days',
+			'90d'         => 'Last 90 Days',
+			'this_month'  => 'This Month',
+			'this_quarter'=> 'This Quarter',
+		);
+
+		if ( ! isset( $ranges[ $range_key ] ) ) {
+			$range_key = '30d';
+		}
+
+		$now = current_time( 'timestamp' );
+
+		switch ( $range_key ) {
+			case '90d':
+				$start_ts            = strtotime( '-90 days', $now );
+				$end_ts              = $now;
+				$compare_end_ts      = $start_ts;
+				$compare_start_ts    = strtotime( '-90 days', $start_ts );
+				$comparison_label    = 'previous 90 days';
+				$comparison_sub_label = 'from previous 90 days';
+				break;
+
+			case 'this_month':
+				$start_ts            = strtotime( date_i18n( 'Y-m-01 00:00:00', $now ) );
+				$end_ts              = $now;
+				$compare_start_ts    = strtotime( '-1 month', $start_ts );
+				$compare_end_ts      = $start_ts;
+				$comparison_label    = 'last month';
+				$comparison_sub_label = 'from previous month';
+				break;
+
+			case 'this_quarter':
+				$month               = (int) date_i18n( 'n', $now );
+				$year                = (int) date_i18n( 'Y', $now );
+				$quarter_start_month = (int) floor( ( $month - 1 ) / 3 ) * 3 + 1;
+				$start_ts            = strtotime( sprintf( '%04d-%02d-01 00:00:00', $year, $quarter_start_month ) );
+				$end_ts              = $now;
+				$compare_start_ts    = strtotime( '-3 months', $start_ts );
+				$compare_end_ts      = $start_ts;
+				$comparison_label    = 'last quarter';
+				$comparison_sub_label = 'from previous quarter';
+				break;
+
+			case '30d':
+			default:
+				$start_ts            = strtotime( '-30 days', $now );
+				$end_ts              = $now;
+				$compare_end_ts      = $start_ts;
+				$compare_start_ts    = strtotime( '-30 days', $start_ts );
+				$comparison_label    = 'previous 30 days';
+				$comparison_sub_label = 'from previous 30 days';
+				break;
+		}
+
+		return array(
+			'key'                  => $range_key,
+			'label'                => $ranges[ $range_key ],
+			'start_date'           => gmdate( 'Y-m-d H:i:s', $start_ts ),
+			'end_date'             => gmdate( 'Y-m-d H:i:s', $end_ts ),
+			'comparison_start_date'=> gmdate( 'Y-m-d H:i:s', $compare_start_ts ),
+			'comparison_end_date'  => gmdate( 'Y-m-d H:i:s', $compare_end_ts ),
+			'comparison_label'     => $comparison_label,
+			'comparison_sub_label' => $comparison_sub_label,
+		);
+	}
+}
+
+if ( ! function_exists( 'pitblado_director_dashboard_get_associate_ids' ) ) {
+	function pitblado_director_dashboard_get_associate_ids() {
+		if ( is_user_logged_in() && ! current_user_can( 'manage_options' ) ) {
+			$associates = pitblado_get_active_associates_for_director( get_current_user_id() );
+		} else {
+			$associates = pitblado_get_all_active_associates();
+		}
+
+		if ( empty( $associates ) ) {
+			return array();
+		}
+
+		return array_map( 'intval', wp_list_pluck( $associates, 'ID' ) );
+	}
+}
+
+if ( ! function_exists( 'pitblado_director_dashboard_count_entries_for_associates' ) ) {
+	function pitblado_director_dashboard_count_entries_for_associates( $form_id, $start_date, $end_date, $associate_ids ) {
+		if ( empty( $associate_ids ) ) {
+			return 0;
+		}
+
+		$total = 0;
+
+		foreach ( $associate_ids as $associate_id ) {
+			$count = GFAPI::count_entries(
+				$form_id,
+				array(
+					'status'        => 'active',
+					'start_date'    => $start_date,
+					'end_date'      => $end_date,
+					'field_filters' => array(
+						array(
+							'key'   => 'created_by',
+							'value' => (int) $associate_id,
+						),
+					),
+				)
+			);
+
+			if ( is_wp_error( $count ) ) {
+				continue;
+			}
+
+			$total += (int) $count;
+		}
+
+		return $total;
+	}
+}
+
+add_shortcode( 'director_dashboard_range_selector', function() {
+	$context = pitblado_director_dashboard_get_range_context();
+	$ranges  = array(
+		'30d'          => 'Last 30 Days',
+		'90d'          => 'Last 90 Days',
+		'this_month'   => 'This Month',
+		'this_quarter' => 'This Quarter',
+	);
+
+	$base_url = remove_query_arg( 'range' );
+	$links    = array();
+
+	foreach ( $ranges as $key => $label ) {
+		$url = add_query_arg( 'range', $key, $base_url );
+
+		$links[] = sprintf(
+			'<a class="director-range-pill %s" href="%s">%s</a>',
+			$context['key'] === $key ? 'is-active' : '',
+			esc_url( $url ),
+			esc_html( $label )
+		);
+	}
+
+	static $styles_printed = false;
+	$styles = '';
+
+	if ( ! $styles_printed ) {
+		$styles_printed = true;
+		$styles         = '<style>
+			.director-range-selector{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+			.director-range-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;border:1px solid #d8dce4;background:#fff;color:#1f2937;font-size:13px;font-weight:600;text-decoration:none;line-height:1.3}
+			.director-range-pill:hover{border-color:#c3cada;background:#f8fafc}
+			.director-range-pill.is-active{background:#1f2937;border-color:#1f2937;color:#fff}
+		</style>';
+	}
+
+	return $styles . '<div class="director-range-selector" role="group" aria-label="Director dashboard date range">' . implode( '', $links ) . '</div>';
+} );
+
+add_shortcode( 'director_relationship_type_chart', function() {
+	if ( ! class_exists( 'GFAPI' ) ) {
+		return '';
+	}
+
+	$context       = pitblado_director_dashboard_get_range_context();
+	$associate_ids = pitblado_director_dashboard_get_associate_ids();
+
+	if ( empty( $associate_ids ) ) {
+		return '<div class="director-kpi-meta">No assigned associates</div>';
+	}
+
+	$relationship_counts = array();
+
+	foreach ( $associate_ids as $associate_id ) {
+		$paging = array(
+			'offset'    => 0,
+			'page_size' => 200,
+		);
+
+		do {
+			$entries = GFAPI::get_entries(
+				1,
+				array(
+					'status'        => 'active',
+					'start_date'    => $context['start_date'],
+					'end_date'      => $context['end_date'],
+					'field_filters' => array(
+						array(
+							'key'   => 'created_by',
+							'value' => (int) $associate_id,
+						),
+					),
+				),
+				null,
+				$paging
+			);
+
+			if ( is_wp_error( $entries ) || empty( $entries ) ) {
+				break;
+			}
+
+			foreach ( $entries as $entry ) {
+				$relationship = trim( (string) rgar( $entry, '1' ) );
+
+				if ( '' === $relationship ) {
+					$relationship = 'Unspecified';
+				}
+
+				if ( ! isset( $relationship_counts[ $relationship ] ) ) {
+					$relationship_counts[ $relationship ] = 0;
+				}
+
+				$relationship_counts[ $relationship ]++;
+			}
+
+			$paging['offset'] += $paging['page_size'];
+		} while ( count( $entries ) === $paging['page_size'] );
+	}
+
+	if ( empty( $relationship_counts ) ) {
+		return '<div class="director-kpi-meta">No relationship logs in ' . esc_html( strtolower( $context['label'] ) ) . '</div>';
+	}
+
+	arsort( $relationship_counts );
+	$colors         = array( '#3b82f6', '#22c55e', '#f59e0b', '#a855f7', '#ef4444', '#06b6d4', '#64748b' );
+	$total          = array_sum( $relationship_counts );
+	$conic_parts    = array();
+	$legend_rows    = array();
+	$current_angle  = 0;
+	$index          = 0;
+
+	foreach ( $relationship_counts as $label => $count ) {
+		$color       = $colors[ $index % count( $colors ) ];
+		$percentage  = ( $count / $total ) * 100;
+		$start_angle = $current_angle;
+		$end_angle   = min( 100, $current_angle + $percentage );
+
+		$conic_parts[] = sprintf( '%1$s %2$.2f%% %1$s %3$.2f%%', $color, $start_angle, $end_angle );
+
+		$legend_rows[] = sprintf(
+			'<div class="director-relationship-legend-row"><span class="director-relationship-dot" style="background:%s"></span><span class="director-relationship-name">%s</span><span class="director-relationship-count">%d</span></div>',
+			esc_attr( $color ),
+			esc_html( $label ),
+			(int) $count
+		);
+
+		$current_angle = $end_angle;
+		$index++;
+	}
+
+	static $styles_printed = false;
+	$styles = '';
+
+	if ( ! $styles_printed ) {
+		$styles_printed = true;
+		$styles         = '<style>
+			.director-relationship-card{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);align-items:center;gap:16px}
+			.director-relationship-donut{width:170px;height:170px;border-radius:50%;position:relative;margin:0 auto;background:conic-gradient(var(--segments));}
+			.director-relationship-donut:after{content:"";position:absolute;inset:25px;border-radius:50%;background:#fff}
+			.director-relationship-total{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2;font-weight:700;color:#111827}
+			.director-relationship-total small{font-size:12px;color:#6b7280;font-weight:600}
+			.director-relationship-legend-row{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:8px;margin:6px 0;font-size:13px}
+			.director-relationship-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+			.director-relationship-count{font-weight:700}
+			@media (max-width:640px){.director-relationship-card{grid-template-columns:1fr}}
+		</style>';
+	}
+
+	return $styles .
+		'<div class="director-kpi-submeta" style="margin-bottom:8px;">' . esc_html( $context['label'] ) . '</div>' .
+		'<div class="director-relationship-card">' .
+			'<div class="director-relationship-donut" style="--segments:' . esc_attr( implode( ',', $conic_parts ) ) . ';">' .
+				'<div class="director-relationship-total">' . esc_html( $total ) . '<small>Total logs</small></div>' .
+			'</div>' .
+			'<div class="director-relationship-legend">' . implode( '', $legend_rows ) . '</div>' .
+		'</div>';
+} );
+
 /**Users with no plan**/
 
 add_shortcode( 'director_users_no_plan', function() {
