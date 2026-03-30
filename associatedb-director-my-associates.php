@@ -30,7 +30,7 @@ add_shortcode( 'director_my_associates_page', function() {
 
 	if ( empty( $associates ) ) {
 		return '
-				<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
+				
 				<div class="director-page-header-row">
 					<div class="director-overview-actions">
 						<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
