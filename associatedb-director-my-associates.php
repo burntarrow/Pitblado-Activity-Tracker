@@ -30,9 +30,6 @@ add_shortcode( 'director_my_associates_page', function() {
 
 	if ( empty( $associates ) ) {
 		return '
-			<div class="director-page-panel">
-				' . $success_notice . '
-				<h1 class="director-page-title">' . esc_html( $page_title ) . '</h1>
 				<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
 				<div class="director-page-header-row">
 					<div class="director-overview-actions">
