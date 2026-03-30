@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AssociateDB Director Dashboard Helpers
  * Description: Shortcodes and helper logic for director dashboard panels.
- * Version: 1.0.0
+ * Version: 1.1.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,11 +18,7 @@ add_shortcode( 'director_users_no_plan', function() {
 
 	$director_id = get_current_user_id();
 
-	$associates = get_users( array(
-		'role'       => 'associate',
-		'meta_key'   => 'assigned_director',
-		'meta_value' => $director_id,
-	) );
+	$associates = pitblado_get_active_associates_for_director( $director_id );
 
 	if ( empty( $associates ) ) {
 		return '<div class="director-alert-empty">No associates assigned.</div>';
@@ -100,11 +96,7 @@ add_shortcode( 'director_users_no_activity_14_days', function() {
 	$director_id = get_current_user_id();
 	$cutoff      = gmdate( 'Y-m-d H:i:s', strtotime( '-14 days', current_time( 'timestamp', true ) ) );
 
-	$associates = get_users( array(
-		'role'       => 'associate',
-		'meta_key'   => 'assigned_director',
-		'meta_value' => $director_id,
-	) );
+	$associates = pitblado_get_active_associates_for_director( $director_id );
 
 	if ( empty( $associates ) ) {
 		return '<div class="director-alert-empty">No associates assigned.</div>';
@@ -215,11 +207,7 @@ add_shortcode( 'director_average_plan_progress', function() {
 
 	$director_id = get_current_user_id();
 
-	$associates = get_users( array(
-		'role'       => 'associate',
-		'meta_key'   => 'assigned_director',
-		'meta_value' => $director_id,
-	) );
+	$associates = pitblado_get_active_associates_for_director( $director_id );
 
 	if ( empty( $associates ) ) {
 		return '
@@ -293,11 +281,7 @@ add_shortcode( 'director_average_30_day_completion', function() {
 
 	$director_id = get_current_user_id();
 
-	$associates = get_users( array(
-		'role'       => 'associate',
-		'meta_key'   => 'assigned_director',
-		'meta_value' => $director_id,
-	) );
+	$associates = pitblado_get_active_associates_for_director( $director_id );
 
 	if ( empty( $associates ) ) {
 		return '

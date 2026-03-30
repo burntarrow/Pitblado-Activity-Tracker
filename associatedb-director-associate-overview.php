@@ -2,46 +2,11 @@
 /**
  * Plugin Name: Associate Overview
  * Description: Director associate overview page, recent activity, plan snapshot, and soft deactivation.
- * Version: 1.1.0
+ * Version: 1.2.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-}
-
-/**
- * Helpers
- */
-function pitblado_get_requested_associate_id() {
-	return isset( $_GET['associate_id'] ) ? absint( $_GET['associate_id'] ) : 0;
-}
-
-function pitblado_get_associate_user( $associate_id ) {
-	$user = get_user_by( 'id', $associate_id );
-
-	if ( ! $user ) {
-		return false;
-	}
-
-	if ( ! in_array( 'associate', (array) $user->roles, true ) ) {
-		return false;
-	}
-
-	return $user;
-}
-
-function pitblado_current_user_can_manage_associate( $associate_id ) {
-	if ( ! is_user_logged_in() || ! $associate_id ) {
-		return false;
-	}
-
-	if ( current_user_can( 'manage_options' ) ) {
-		return true;
-	}
-
-	$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
-
-	return $assigned_director === get_current_user_id();
 }
 
 /**
@@ -81,28 +46,6 @@ add_action( 'template_redirect', function() {
 	wp_safe_redirect( add_query_arg( 'deactivated', '1', home_url( '/director/my-associates/' ) ) );
 	exit;
 } );
-
-/**
- * Block inactive associates from logging in.
- */
-add_filter( 'authenticate', function( $user, $username, $password ) {
-	if ( is_wp_error( $user ) || ! $user instanceof WP_User ) {
-		return $user;
-	}
-
-	if ( in_array( 'associate', (array) $user->roles, true ) ) {
-		$status = get_user_meta( $user->ID, 'associate_status', true );
-
-		if ( $status === 'inactive' ) {
-			return new WP_Error(
-				'associate_inactive',
-				__( 'This account has been deactivated. Please contact an administrator.', 'pitblado' )
-			);
-		}
-	}
-
-	return $user;
-}, 30, 3 );
 
 /**
  * Header + KPI row

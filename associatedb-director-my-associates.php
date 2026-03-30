@@ -11,28 +11,7 @@ add_shortcode( 'director_my_associates_page', function() {
 		$success_notice = '<div class="director-success-notice">Associate deactivated successfully.</div>';
 	}
 
-	$associates = get_users( array(
-		'role'       => 'associate',
-		'meta_query' => array(
-			'relation' => 'AND',
-			array(
-				'key'   => 'assigned_director',
-				'value' => $director_id,
-			),
-			array(
-				'relation' => 'OR',
-				array(
-					'key'     => 'associate_status',
-					'compare' => 'NOT EXISTS',
-				),
-				array(
-					'key'     => 'associate_status',
-					'value'   => 'inactive',
-					'compare' => '!=',
-				),
-			),
-		),
-	) );
+	$associates = pitblado_get_active_associates_for_director( $director_id );
 
 	if ( empty( $associates ) ) {
 		return '

@@ -4,10 +4,11 @@ add_shortcode( 'director_plan_submission_card', function() {
 		return '';
 	}
 
-	$associates = get_users( array(
-		'role'   => 'associate',
-		'fields' => array( 'ID', 'display_name' ),
-	) );
+	if ( is_user_logged_in() && ! current_user_can( 'manage_options' ) ) {
+		$associates = pitblado_get_active_associates_for_director( get_current_user_id() );
+	} else {
+		$associates = pitblado_get_all_active_associates();
+	}
 
 	$total_associates = count( $associates );
 	$with_plan        = 0;
@@ -40,8 +41,6 @@ add_shortcode( 'director_plan_submission_card', function() {
 
 	return '
 		<div class="director-plan-card" data-with-plan="' . esc_attr( $with_plan ) . '" data-no-plan="' . esc_attr( $no_plan ) . '">
-			
-
 			<div class="director-plan-chart-wrap">
 				<div class="director-plan-chart">
 					<svg viewBox="0 0 120 120" class="director-plan-svg" aria-hidden="true">
