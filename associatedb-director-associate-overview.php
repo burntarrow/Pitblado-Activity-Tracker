@@ -43,7 +43,7 @@ add_action( 'template_redirect', function() {
 
 	update_user_meta( $associate_id, 'associate_status', 'inactive' );
 
-	wp_safe_redirect( add_query_arg( 'deactivated', '1', home_url( '/director/my-associates/' ) ) );
+	wp_safe_redirect( add_query_arg( 'deactivated', '1', home_url( '/director/associates/' ) ) );
 	exit;
 } );
 
