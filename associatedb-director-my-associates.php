@@ -35,8 +35,14 @@ add_shortcode( 'director_my_associates_page', function() {
 				<h1 class="director-page-title">' . esc_html( $page_title ) . '</h1>
 				<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
 				<div class="director-page-header-row">
-					<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
-					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+					<div class="director-overview-actions">
+						<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
+						<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+					</div>
+					<div class="director-overview-actions">
+						<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
+						<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
+					</div>
 				</div>
 				<div class="director-empty-state">' . esc_html( $empty_state_message ) . '</div>
 			</div>
@@ -152,13 +158,15 @@ add_shortcode( 'director_my_associates_page', function() {
 			' . $success_notice . '
 
 			<div class="director-page-header-row">
-				<div>
-					<h1 class="director-page-title">' . esc_html( $page_title ) . '</h1>
-					<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
-				</div>
+				<h1 class="director-page-title">' . esc_html( $page_title ) . '</h1>
+			</div>
+			<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
+			<div class="director-page-header-row">
 				<div class="director-overview-actions">
 					<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
 					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+				</div>
+				<div class="director-overview-actions">
 					<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
 					<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
 				</div>
