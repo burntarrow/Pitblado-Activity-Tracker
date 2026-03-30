@@ -5,21 +5,40 @@ add_shortcode( 'director_my_associates_page', function() {
 	}
 
 	$director_id = get_current_user_id();
+	$scope       = isset( $_GET['scope'] ) ? sanitize_key( wp_unslash( $_GET['scope'] ) ) : 'mine';
+	$scope       = in_array( $scope, array( 'mine', 'all' ), true ) ? $scope : 'mine';
 
 	$success_notice = '';
 	if ( isset( $_GET['deactivated'] ) && $_GET['deactivated'] === '1' ) {
 		$success_notice = '<div class="director-success-notice">Associate deactivated successfully.</div>';
 	}
 
-	$associates = pitblado_get_active_associates_for_director( $director_id );
+	$associates = 'all' === $scope
+		? pitblado_get_all_active_associates()
+		: pitblado_get_active_associates_for_director( $director_id );
+
+	$page_title            = 'mine' === $scope ? 'My Associates' : 'All Associates';
+	$first_stat_label      = 'mine' === $scope ? 'Assigned Associates' : 'Total Associates';
+	$scope_mine_button     = 'mine' === $scope ? 'director-primary-btn' : 'director-secondary-btn';
+	$scope_all_button      = 'all' === $scope ? 'director-primary-btn' : 'director-secondary-btn';
+	$scope_mine_url        = add_query_arg( 'scope', 'mine', home_url( '/director/associates/' ) );
+	$scope_all_url         = add_query_arg( 'scope', 'all', home_url( '/director/associates/' ) );
+	$inactive_url          = add_query_arg( 'scope', $scope, home_url( '/director/associates/inactive/' ) );
+	$empty_state_message   = 'mine' === $scope
+		? 'No associates are currently assigned to you.'
+		: 'No active associates found.';
 
 	if ( empty( $associates ) ) {
 		return '
 			<div class="director-page-panel">
 				' . $success_notice . '
-				<h1 class="director-page-title">My Associates</h1>
-				<p class="director-page-subtitle">Review your assigned associates and their current activity and plan status.</p>
-				<div class="director-empty-state">No associates are currently assigned to you.</div>
+				<h1 class="director-page-title">' . esc_html( $page_title ) . '</h1>
+				<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
+				<div class="director-page-header-row">
+					<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
+					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+				</div>
+				<div class="director-empty-state">' . esc_html( $empty_state_message ) . '</div>
 			</div>
 		';
 	}
@@ -124,7 +143,7 @@ add_shortcode( 'director_my_associates_page', function() {
 			esc_html( $thirty_day ),
 			$plan_status === 'Submitted' ? 'is-submitted' : 'is-missing',
 			esc_html( $plan_status ),
-			esc_url( add_query_arg( 'associate_id', $user_id, home_url( '/director/associates/overview/' ) ) )
+			esc_url( add_query_arg( 'associate_id', $user_id, home_url( '/director/associate-overview/' ) ) )
 		);
 	}
 
@@ -133,13 +152,21 @@ add_shortcode( 'director_my_associates_page', function() {
 			' . $success_notice . '
 
 			<div class="director-page-header-row">
-				<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
-				<a class="director-secondary-btn" href="' . esc_url( home_url( '/director/associates/inactive/' ) ) . '">View Inactive Associates</a>
+				<div>
+					<h1 class="director-page-title">' . esc_html( $page_title ) . '</h1>
+					<p class="director-page-subtitle">Review associates and their current activity and plan status.</p>
+				</div>
+				<div class="director-overview-actions">
+					<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
+					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+					<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
+					<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
+				</div>
 			</div>
 
 			<div class="director-mini-stats">
 				<div class="director-mini-stat">
-					<div class="director-mini-stat-label">Assigned Associates</div>
+					<div class="director-mini-stat-label">' . esc_html( $first_stat_label ) . '</div>
 					<div class="director-mini-stat-value">' . esc_html( $total_associates ) . '</div>
 				</div>
 				<div class="director-mini-stat">
