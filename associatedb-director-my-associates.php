@@ -146,7 +146,7 @@ add_shortcode( 'director_my_associates_page', function() {
 			esc_html( $thirty_day ),
 			$plan_status === 'Submitted' ? 'is-submitted' : 'is-missing',
 			esc_html( $plan_status ),
-			esc_url( add_query_arg( 'associate_id', $user_id, home_url( '/director/associate-overview/' ) ) )
+			esc_url( add_query_arg( 'associate_id', $user_id, home_url( '/director/associates/overview/' ) ) )
 		);
 	}
 
