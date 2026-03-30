@@ -135,14 +135,14 @@ add_shortcode( 'director_associate_dashboard', function() {
 	}
 
 	$plans_url    = add_query_arg( 'associate_id', $associate_id, home_url( '/director/plans/' ) );
-	$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/reassign-associate/' ) );
+	$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/reassign/' ) );
 
 	$deactivate_url = add_query_arg(
 		array(
 			'associate_id'         => $associate_id,
 			'deactivate_associate' => 1,
 		),
-		home_url( '/director/associate-overview/' )
+		home_url( '/director/associates/overview/' )
 	);
 
 	$deactivate_url = wp_nonce_url( $deactivate_url, 'deactivate_associate_' . $associate_id );
