@@ -6,6 +6,11 @@ add_shortcode( 'director_my_associates_page', function() {
 
 	$director_id = get_current_user_id();
 
+	$success_notice = '';
+	if ( isset( $_GET['deactivated'] ) && $_GET['deactivated'] === '1' ) {
+		$success_notice = '<div class="director-success-notice">Associate deactivated successfully.</div>';
+	}
+
 	$associates = get_users( array(
 		'role'       => 'associate',
 		'meta_query' => array(
@@ -29,11 +34,6 @@ add_shortcode( 'director_my_associates_page', function() {
 		),
 	) );
 
-	$success_notice = '';
-	if ( isset( $_GET['deactivated'] ) && $_GET['deactivated'] === '1' ) {
-		$success_notice = '<div class="director-success-notice">Associate deactivated successfully.</div>';
-	}
-
 	if ( empty( $associates ) ) {
 		return '
 			<div class="director-page-panel">
@@ -45,16 +45,15 @@ add_shortcode( 'director_my_associates_page', function() {
 		';
 	}
 
-	$total_associates  = count( $associates );
-	$with_plan_count   = 0;
-	$no_activity_count = 0;
-	$rows              = array();
-	$cutoff_timestamp  = strtotime( '-14 days', current_time( 'timestamp' ) );
+	$total_associates   = count( $associates );
+	$with_plan_count    = 0;
+	$no_activity_count  = 0;
+	$rows               = array();
+	$cutoff_timestamp   = strtotime( '-14 days', current_time( 'timestamp' ) );
 
 	foreach ( $associates as $associate ) {
 		$user_id = (int) $associate->ID;
 
-		// Latest activity entry.
 		$activity_entries = GFAPI::get_entries(
 			1,
 			array(
@@ -77,8 +76,8 @@ add_shortcode( 'director_my_associates_page', function() {
 			)
 		);
 
-		$last_activity    = 'No activity yet';
-		$last_activity_ts = 0;
+		$last_activity      = 'No activity yet';
+		$last_activity_ts   = 0;
 
 		if ( ! is_wp_error( $activity_entries ) && ! empty( $activity_entries ) ) {
 			$last_activity_ts = strtotime( $activity_entries[0]['date_created'] );
@@ -89,7 +88,6 @@ add_shortcode( 'director_my_associates_page', function() {
 			$no_activity_count++;
 		}
 
-		// Latest plan entry.
 		$plan_entries = GFAPI::get_entries(
 			4,
 			array(
@@ -112,9 +110,9 @@ add_shortcode( 'director_my_associates_page', function() {
 			)
 		);
 
-		$plan_progress = '—';
-		$thirty_day    = '—';
-		$plan_status   = 'No Plan';
+		$plan_progress    = '—';
+		$thirty_day       = '—';
+		$plan_status      = 'No Plan';
 
 		if ( ! is_wp_error( $plan_entries ) && ! empty( $plan_entries ) ) {
 			$with_plan_count++;
