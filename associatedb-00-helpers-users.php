@@ -95,6 +95,49 @@ if ( ! function_exists( 'pitblado_get_all_active_associates' ) ) {
 	}
 }
 
+if ( ! function_exists( 'pitblado_get_inactive_associates_for_director' ) ) {
+	function pitblado_get_inactive_associates_for_director( $director_id ) {
+		$director_id = absint( $director_id );
+
+		if ( ! $director_id ) {
+			return array();
+		}
+
+		return get_users(
+			array(
+				'role'       => 'associate',
+				'meta_query' => array(
+					'relation' => 'AND',
+					array(
+						'key'   => 'assigned_director',
+						'value' => $director_id,
+					),
+					array(
+						'key'   => 'associate_status',
+						'value' => 'inactive',
+					),
+				),
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'pitblado_get_all_inactive_associates' ) ) {
+	function pitblado_get_all_inactive_associates() {
+		return get_users(
+			array(
+				'role'       => 'associate',
+				'meta_query' => array(
+					array(
+						'key'   => 'associate_status',
+						'value' => 'inactive',
+					),
+				),
+			)
+		);
+	}
+}
+
 if ( ! function_exists( 'pitblado_current_user_can_manage_associate' ) ) {
 	function pitblado_current_user_can_manage_associate( $associate_id ) {
 		$associate_id = absint( $associate_id );
@@ -113,6 +156,28 @@ if ( ! function_exists( 'pitblado_current_user_can_manage_associate' ) ) {
 
 		if ( pitblado_is_associate_inactive( $associate_id ) ) {
 			return false;
+		}
+
+		$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
+
+		return $assigned_director === get_current_user_id();
+	}
+}
+
+if ( ! function_exists( 'pitblado_current_user_can_reactivate_associate' ) ) {
+	function pitblado_current_user_can_reactivate_associate( $associate_id ) {
+		$associate_id = absint( $associate_id );
+
+		if ( ! is_user_logged_in() || ! $associate_id ) {
+			return false;
+		}
+
+		if ( ! pitblado_get_associate_user( $associate_id ) ) {
+			return false;
+		}
+
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
 		}
 
 		$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );

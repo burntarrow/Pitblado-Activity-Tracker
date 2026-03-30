@@ -134,6 +134,7 @@ add_shortcode( 'director_my_associates_page', function() {
 
 			<div class="director-page-header-row">
 				<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
+				<a class="director-secondary-btn" href="' . esc_url( home_url( '/director/associates/inactive/' ) ) . '">View Inactive Associates</a>
 			</div>
 
 			<div class="director-mini-stats">
