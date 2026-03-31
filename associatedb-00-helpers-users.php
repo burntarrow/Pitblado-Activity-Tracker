@@ -15,6 +15,32 @@ if ( ! function_exists( 'pitblado_get_requested_associate_id' ) ) {
 	}
 }
 
+
+if ( ! function_exists( 'pitblado_resolve_requested_manageable_associate' ) ) {
+	function pitblado_resolve_requested_manageable_associate() {
+		$associate_id = pitblado_get_requested_associate_id();
+
+		if ( ! $associate_id ) {
+			return new WP_Error( 'missing_associate', __( 'No associate selected.', 'pitblado' ) );
+		}
+
+		$associate = pitblado_get_associate_user( $associate_id );
+		if ( ! $associate ) {
+			return new WP_Error( 'invalid_associate', __( 'Associate not found.', 'pitblado' ) );
+		}
+
+		if ( current_user_can( 'manage_options' ) ) {
+			return $associate;
+		}
+
+		if ( ! pitblado_current_user_can_manage_associate( $associate_id ) ) {
+			return new WP_Error( 'forbidden_associate', __( 'You do not have access to this associate.', 'pitblado' ) );
+		}
+
+		return $associate;
+	}
+}
+
 if ( ! function_exists( 'pitblado_get_associate_user' ) ) {
 	function pitblado_get_associate_user( $associate_id ) {
 		$user = get_user_by( 'id', absint( $associate_id ) );
