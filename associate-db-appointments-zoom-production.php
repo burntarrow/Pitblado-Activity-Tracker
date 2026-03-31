@@ -23,7 +23,7 @@ final class AssociateDB_Appointments {
 	private const DEFAULT_CONSULTANT_NAME = 'Norm Dupas';
 	private const DEFAULT_ZOOM_HOST = 'norm@niva10.com';
 	private const VIDEO_FORMAT_VALUE = 'Video call';
-	private const APPOINTMENTS_PAGE_URL = '/associate/my-appointments/';
+	private const APPOINTMENTS_PAGE_URL = '/associate/my-meetings/';
 	private const BOOK_A_MEETING_URL = '/associate/book-a-meeting/';
 	private const OPTION_KEY = 'assoc_db_appointments_settings';
 	private const META_ZOOM_MEETING_ID = 'assoc_zoom_meeting_id';
