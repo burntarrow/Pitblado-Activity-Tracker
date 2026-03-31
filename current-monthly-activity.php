@@ -48,7 +48,7 @@ add_shortcode( 'director_logs_month_compare', function() {
 
 	return '
 		<div class="director-kpi-value">' . esc_html( $selected_count ) . '</div>
-		<div class="director-kpi-meta">Logs in Selected Range (' . esc_html( $context['label'] ) . ')</div>
+		<div class="director-kpi-meta">Submissions in (' . esc_html( $context['label'] ) . ')</div>
 		<div class="director-kpi-submeta">vs ' . esc_html( $previous_count ) . ' ' . esc_html( $context['comparison_label'] ) . ' • ' . esc_html( $delta_text ) . ' ' . esc_html( $context['comparison_sub_label'] ) . '</div>
 	';
 } );
