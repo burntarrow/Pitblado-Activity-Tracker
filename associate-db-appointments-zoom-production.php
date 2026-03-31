@@ -147,7 +147,7 @@ final class AssociateDB_Appointments {
 						<th scope="row"><label for="assoc_zoom_host_user">Zoom Host User</label></th>
 						<td>
 							<input name="<?php echo esc_attr( self::OPTION_KEY ); ?>[zoom_host_user]" type="text" id="assoc_zoom_host_user" value="<?php echo esc_attr( $settings['zoom_host_user'] ); ?>" class="regular-text">
-							<p class="description">Use Norm¡¯s Zoom user email or Zoom user ID.</p>
+							<p class="description">Use Norm's Zoom user email or Zoom user ID.</p>
 						</td>
 					</tr>
 				</table>
@@ -317,7 +317,7 @@ final class AssociateDB_Appointments {
 					'help_with'      => self::extract_field_display_value( $form, $entry, self::HELP_WITH_FIELD_ID ),
 					'company'        => self::extract_field_display_value( $form, $entry, self::COMPANY_FIELD_ID ),
 					'status'         => self::extract_booking_status( $booking, $entry ),
-					'date_line'      => wp_date( 'D, M j ¡¤ g:i A', $start_ts ),
+					'date_line'      => wp_date( 'D, M j - g:i A', $start_ts ),
 					'manage_url'     => self::get_manage_url( $form, $entry, $booking ),
 					'zoom_join_url'  => (string) gform_get_meta( (int) rgar( $entry, 'id' ), self::META_ZOOM_JOIN_URL ),
 					'zoom_error'     => (string) gform_get_meta( (int) rgar( $entry, 'id' ), self::META_ZOOM_LAST_ERROR ),
