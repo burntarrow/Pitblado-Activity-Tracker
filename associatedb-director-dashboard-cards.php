@@ -249,7 +249,7 @@ add_shortcode( 'director_relationship_type_chart', function() {
 		$start_angle = $current_angle;
 		$end_angle   = min( 100, $current_angle + $percentage );
 
-		$conic_parts[] = sprintf( '%1$s %2$.2f%% %1$s %3$.2f%%', $color, $start_angle, $end_angle );
+		$conic_parts[] = sprintf( '%1$s %2$.2f%% %3$.2f%%', $color, $start_angle, $end_angle );
 
 		$legend_rows[] = sprintf(
 			'<div class="director-relationship-legend-row"><span class="director-relationship-dot" style="background:%s"></span><span class="director-relationship-name">%s</span><span class="director-relationship-count">%d</span></div>',
@@ -269,7 +269,7 @@ add_shortcode( 'director_relationship_type_chart', function() {
 		$styles_printed = true;
 		$styles         = '<style>
 			.director-relationship-card{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);align-items:center;gap:16px}
-			.director-relationship-donut{width:170px;height:170px;border-radius:50%;position:relative;margin:0 auto;background:conic-gradient(var(--segments));}
+			.director-relationship-donut{width:170px;height:170px;border-radius:50%;position:relative;margin:0 auto;}
 			.director-relationship-donut:after{content:"";position:absolute;inset:25px;border-radius:50%;background:#fff}
 			.director-relationship-total{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2;font-weight:700;color:#111827}
 			.director-relationship-total small{font-size:12px;color:#6b7280;font-weight:600}
@@ -283,7 +283,7 @@ add_shortcode( 'director_relationship_type_chart', function() {
 	return $styles .
 		'<div class="director-kpi-submeta" style="margin-bottom:8px;">' . esc_html( $context['label'] ) . '</div>' .
 		'<div class="director-relationship-card">' .
-			'<div class="director-relationship-donut" style="--segments:' . esc_attr( implode( ',', $conic_parts ) ) . ';">' .
+			'<div class="director-relationship-donut" style="background:conic-gradient(' . esc_attr( implode( ',', $conic_parts ) ) . ');">' .
 				'<div class="director-relationship-total">' . esc_html( $total ) . '<small>Total logs</small></div>' .
 			'</div>' .
 			'<div class="director-relationship-legend">' . implode( '', $legend_rows ) . '</div>' .
