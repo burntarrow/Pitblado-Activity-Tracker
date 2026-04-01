@@ -294,6 +294,11 @@ final class AssociateDB_Appointments {
 					continue;
 				}
 
+				$status = strtolower( trim( self::extract_booking_status( $booking, $entry ) ) );
+				if ( in_array( $status, [ 'canceled', 'cancelled' ], true ) ) {
+					continue;
+				}
+
 				if ( $upcoming_only && $start_ts < $now ) {
 					continue;
 				}
