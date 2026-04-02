@@ -53,10 +53,11 @@ add_shortcode( 'director_inactive_associates_page', function() {
 	}
 
 	$current_user_id = get_current_user_id();
+	$styles          = function_exists( 'pitblado_get_director_shared_styles' ) ? pitblado_get_director_shared_styles() : '';
 	$is_admin        = current_user_can( 'manage_options' );
 
 	if ( ! $is_admin && ! current_user_can( 'read' ) ) {
-		return '<div class="director-empty-state">You do not have permission to view this page.</div>';
+		return $styles . '<div class="director-empty-state">You do not have permission to view this page.</div>';
 	}
 
 	$success_notice = '';
@@ -69,7 +70,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 		: pitblado_get_inactive_associates_for_director( $current_user_id );
 
 	if ( empty( $associates ) ) {
-		return '
+		return $styles . '
 			<div class="director-page-panel">
 				' . $success_notice . '
 				<div class="director-page-header-row">
@@ -180,7 +181,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 	}
 
 	if ( empty( $rows ) ) {
-		return '
+		return $styles . '
 			<div class="director-page-panel">
 				' . $success_notice . '
 				<div class="director-page-header-row">
@@ -195,7 +196,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 		';
 	}
 
-	return '
+	return $styles . '
 		<div class="director-page-panel">
 			' . $success_notice . '
 			<div class="director-page-header-row">
