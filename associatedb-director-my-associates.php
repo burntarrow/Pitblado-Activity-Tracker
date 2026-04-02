@@ -202,3 +202,60 @@ if ( empty( $associates ) ) {
 		</div>
 	';
 } );
+
+
+/*---Activity Page---*/
+add_shortcode( 'director_associate_activity_page', function() {
+	if ( ! is_user_logged_in() || ! class_exists( 'GFAPI' ) ) {
+		return '';
+	}
+
+	$associate_id = isset( $_GET['associate_id'] ) ? absint( $_GET['associate_id'] ) : 0;
+
+	if ( ! $associate_id ) {
+		return '<div class="director-empty-state">No associate selected.</div>';
+	}
+
+	$associate = get_user_by( 'id', $associate_id );
+
+	if ( ! $associate || ! in_array( 'associate', (array) $associate->roles, true ) ) {
+		return '<div class="director-empty-state">Associate not found.</div>';
+	}
+
+	$is_admin          = current_user_can( 'manage_options' );
+	$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
+
+	if ( ! $is_admin && $assigned_director !== get_current_user_id() ) {
+		return '<div class="director-empty-state">You do not have access to this associate.</div>';
+	}
+
+	$overview_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/overview/' ) );
+	$all_activity_url = home_url( '/director/activity/' );
+
+	$view_shortcode = sprintf(
+		'[gravityview id="708" secret="f4726efa8f9c" search_field="created_by" search_operator="is" search_value="%d" page_size="15" sort_direction="DESC" back_link_label="← Back to Associate Activity"]',
+		$associate_id
+	);
+
+	ob_start();
+	?>
+	<div class="director-page-panel">
+		<div class="director-page-header-row">
+			<div>
+				<h1 class="director-page-title">Associate Activity</h1>
+				<p class="director-page-subtitle"><?php echo esc_html( $associate->display_name ); ?> · <?php echo esc_html( $associate->user_email ); ?></p>
+			</div>
+			<div class="director-overview-actions">
+				<a class="director-secondary-btn" href="<?php echo esc_url( $overview_url ); ?>">Back to Overview</a>
+				<a class="director-secondary-btn" href="<?php echo esc_url( $all_activity_url ); ?>">All Activity</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="director-page-panel">
+		<?php echo do_shortcode( $view_shortcode ); ?>
+	</div>
+	<?php
+	return ob_get_clean();
+} );
+
