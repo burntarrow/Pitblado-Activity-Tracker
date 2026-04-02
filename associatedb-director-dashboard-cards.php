@@ -155,20 +155,7 @@ add_shortcode( 'director_dashboard_range_selector', function() {
 		);
 	}
 
-	static $styles_printed = false;
-	$styles = '';
-
-	if ( ! $styles_printed ) {
-		$styles_printed = true;
-		$styles         = '<style>
-			.director-range-selector{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
-			.director-range-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;border:1px solid #d8dce4;background:#fff;color:#1f2937;font-size:13px;font-weight:600;text-decoration:none;line-height:1.3}
-			.director-range-pill:hover{border-color:#c3cada;background:#f8fafc}
-			.director-range-pill.is-active{background:#1f2937;border-color:#1f2937;color:#fff}
-		</style>';
-	}
-
-	return $styles . '<div class="director-range-selector" role="group" aria-label="Director dashboard date range">' . implode( '', $links ) . '</div>';
+	return '<div class="director-range-selector" role="group" aria-label="Director dashboard date range">' . implode( '', $links ) . '</div>';
 } );
 
 add_shortcode( 'director_relationship_type_chart', function() {
@@ -262,25 +249,7 @@ add_shortcode( 'director_relationship_type_chart', function() {
 		$index++;
 	}
 
-	static $styles_printed = false;
-	$styles = '';
-
-	if ( ! $styles_printed ) {
-		$styles_printed = true;
-		$styles         = '<style>
-			.director-relationship-card{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);align-items:center;gap:16px}
-			.director-relationship-donut{width:170px;height:170px;border-radius:50%;position:relative;margin:0 auto;}
-			.director-relationship-donut:after{content:"";position:absolute;inset:25px;border-radius:50%;background:#fff}
-			.director-relationship-total{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2;font-weight:700;color:#111827}
-			.director-relationship-total small{font-size:12px;color:#6b7280;font-weight:600}
-			.director-relationship-legend-row{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:8px;margin:6px 0;font-size:13px}
-			.director-relationship-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
-			.director-relationship-count{font-weight:700}
-			@media (max-width:640px){.director-relationship-card{grid-template-columns:1fr}}
-		</style>';
-	}
-
-	return $styles .
+	return
 		'<div class="director-kpi-submeta" style="margin-bottom:8px;">' . esc_html( $context['label'] ) . '</div>' .
 		'<div class="director-relationship-card">' .
 			'<div class="director-relationship-donut" style="background:conic-gradient(' . esc_attr( implode( ',', $conic_parts ) ) . ');">' .
