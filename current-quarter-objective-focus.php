@@ -53,6 +53,7 @@ add_shortcode( 'associate_current_quarter_focus', function() {
 	}
 
 	$value = trim( wp_strip_all_tags( (string) rgar( $entry, (string) $field_id ) ) );
+	$label = 'Current Quarter Objective';
 
 	if ( $value === '' ) {
 		return '<span class="assoc-current-quarter-empty">No objective set</span>';
