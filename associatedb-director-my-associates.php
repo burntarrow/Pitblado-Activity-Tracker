@@ -285,11 +285,11 @@ add_shortcode( 'director_associate_plan_page', function() {
 		return '<div class="director-empty-state">You do not have access to this associate.</div>';
 	}
 
-	$overview_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/overview/' ) );
+	$overview_url  = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/overview/' ) );
 	$all_plans_url = home_url( '/director/plans/' );
 
 	$view_shortcode = sprintf(
-		'[gravityview id="PLAN_VIEW_ID" secret="PLAN_VIEW_SECRET" search_field="created_by" search_operator="is" search_value="%d" page_size="1" sort_direction="DESC"]',
+		'[gravityview id="714" secret="8ea7768df2a0" search_field="created_by" search_operator="is" search_value="%d" page_size="1" sort_direction="DESC"]',
 		$associate_id
 	);
 
@@ -314,4 +314,3 @@ add_shortcode( 'director_associate_plan_page', function() {
 	<?php
 	return ob_get_clean();
 } );
-
