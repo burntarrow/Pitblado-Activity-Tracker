@@ -382,7 +382,7 @@ add_shortcode( 'director_associate_dashboard', function() {
 		$thirty_day    = rgar( $plan_entry, '36' ) !== '' ? absint( rgar( $plan_entry, '36' ) ) . '%' : '—';
 	}
 
-	$plans_url    = add_query_arg( 'associate_id', $associate_id, home_url( '/director/plans/' ) );
+    $plans_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/plan/' ) );
 	$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/reassign/' ) );
 
 	$deactivate_url = add_query_arg(
@@ -499,7 +499,7 @@ add_shortcode( 'director_associate_recent_activity', function() {
 				'associate_id' => $associate_id,
 				'entry'        => $entry_id,
 			),
-			home_url( '/director/activity/' )
+			home_url( '/director/associates/activity/' )
 		);
 
 		$rows[] = sprintf(
@@ -526,7 +526,7 @@ add_shortcode( 'director_associate_recent_activity', function() {
 					<div class="director-panel-title">Recent Activity</div>
 					<div class="director-panel-subtitle">Latest submissions for this associate.</div>
 				</div>
-				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/activity/' ) ) ) . '">View All Activity</a>
+				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/activity/' ) ) ) . '">View All Activity</a>
 			</div>
 			<div class="director-associates-table-wrap">
 				<table class="director-associates-table">
