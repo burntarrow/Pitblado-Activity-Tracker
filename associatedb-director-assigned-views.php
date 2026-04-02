@@ -1,6 +1,11 @@
 <?php
 /**
- * Filter director GravityView output so directors only see entries they can access.
+ * Plugin Name: AssociateDB Director Assigned GravityView Filters
+ * Description: Restricts /director/activity and /director/plans GravityView content to accessible associates and injects context panels.
+ * Version: 1.1.0
+ *
+ * Shortcodes: none.
+ * Target pages: /director/activity/, /director/plans/
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

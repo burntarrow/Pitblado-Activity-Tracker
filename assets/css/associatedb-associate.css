@@ -1,0 +1,17 @@
+/* Associate portal pages (dashboard, activity history, contacts). */
+.associate-dashboard-shell .gv-table-view,
+.associate-activity-history-shell .gv-table-view,
+.associate-contacts-shell .gv-table-view {
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  overflow: auto;
+}
+
+.associate-dashboard-shell .progress,
+.associate-dashboard-shell .progress-bar {
+  border-radius: 999px;
+}
+
+.associate-dashboard-shell .director-mini-stats {
+  margin-top: 0;
+}

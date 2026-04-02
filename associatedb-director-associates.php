@@ -1,12 +1,17 @@
 <?php
+/**
+ * Purpose: Render /director/associates/ list with My/All scope toggle and KPI summary.
+ * Shortcodes: [director_my_associates_page]
+ * Target page: /director/associates/
+ */
 add_shortcode( 'director_my_associates_page', function() {
 	if ( ! is_user_logged_in() || ! class_exists( 'GFAPI' ) ) {
 		return '';
 	}
 
 	$director_id = get_current_user_id();
-	$scope       = isset( $_GET['scope'] ) ? sanitize_key( wp_unslash( $_GET['scope'] ) ) : 'mine';
-	$scope       = in_array( $scope, array( 'mine', 'all' ), true ) ? $scope : 'mine';
+	$scope       = isset( $_GET['scope'] ) ? sanitize_key( wp_unslash( $_GET['scope'] ) ) : 'all';
+	$scope       = in_array( $scope, array( 'mine', 'all' ), true ) ? $scope : 'all';
 
 	$success_notice = '';
 	if ( isset( $_GET['deactivated'] ) && $_GET['deactivated'] === '1' ) {

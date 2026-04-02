@@ -158,12 +158,11 @@ add_shortcode( 'director_associate_dashboard', function() {
 	);
 
 	$deactivate_url = wp_nonce_url( $deactivate_url, 'deactivate_associate_' . $associate_id );
-	$styles         = pitblado_get_director_associate_overview_styles();
 
 	ob_start();
 	?>
 	<?php echo $styles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-	<div class="director-page-panel">
+	<div class="director-page-panel director-associate-overview-panel">
 		<div class="director-page-header-row">
 			<div>
 				<h1 class="director-page-title"><?php echo esc_html( $associate->display_name ); ?></h1>
@@ -394,7 +393,7 @@ add_shortcode( 'director_associate_plan_snapshot', function() {
 				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/plan/' ) ) ) . '">Open Full Plan</a>
 			</div>
 
-			<div class="director-plan-grid">
+			<div class="director-plan-grid director-plan-snapshot-grid">
 				<div>
 					<div class="director-mini-stat-label">Annual Focus</div>
 					<div class="director-plan-text">' . esc_html( $annual_focus ) . '</div>
