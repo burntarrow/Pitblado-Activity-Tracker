@@ -627,7 +627,7 @@ add_shortcode( 'director_associate_plan_snapshot', function() {
 					<div class="director-panel-title">Plan Snapshot</div>
 					<div class="director-panel-subtitle">Latest submitted accelerator plan.</div>
 				</div>
-				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/plans/' ) ) ) . '">Open Full Plan</a>
+				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/plan/' ) ) ) . '">Open Full Plan</a>
 			</div>
 
 			<div class="director-plan-grid">
