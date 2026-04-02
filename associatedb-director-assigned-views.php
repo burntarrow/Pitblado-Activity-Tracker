@@ -39,6 +39,8 @@ if ( ! function_exists( 'pitblado_get_director_page_context_panel' ) ) {
 		$all_url        = 'plans' === $mode ? $plans_url : $activity_url;
 		$focused_label  = 'plans' === $mode ? 'Associate Plan' : 'Associate Activity';
 
+		$styles = function_exists( 'pitblado_get_director_shared_styles' ) ? pitblado_get_director_shared_styles() : '';
+
 		ob_start();
 		?>
 		<div class="director-page-panel">
@@ -61,7 +63,8 @@ if ( ! function_exists( 'pitblado_get_director_page_context_panel' ) ) {
 if ( ! function_exists( 'pitblado_render_director_associate_plan_focus' ) ) {
 	function pitblado_render_director_associate_plan_focus( WP_User $associate ) {
 		if ( ! class_exists( 'GFAPI' ) ) {
-			return '<div class="director-empty-state">Plans are currently unavailable.</div>';
+			$styles = function_exists( 'pitblado_get_director_shared_styles' ) ? pitblado_get_director_shared_styles() : '';
+			return $styles . '<div class="director-empty-state">Plans are currently unavailable.</div>';
 		}
 
 		$entries = GFAPI::get_entries(

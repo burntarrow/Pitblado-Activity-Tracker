@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: AssociateDB Helpers - Users
+ * Plugin Name: AssociateDB Helpers Users
  * Description: Shared helpers for active associate assignment, ownership checks, and inactive login blocking.
- * Version: 1.0.0
+ * Version: 1.1.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,6 +24,26 @@ if ( ! function_exists( 'pitblado_resolve_requested_manageable_associate' ) ) {
 			return new WP_Error( 'missing_associate', __( 'No associate selected.', 'pitblado' ) );
 		}
 
+		return pitblado_get_manageable_associate( $associate_id );
+	}
+}
+
+
+if ( ! function_exists( 'pitblado_get_manageable_associate' ) ) {
+	/**
+	 * Resolve an associate and verify current user can manage that associate.
+	 *
+	 * @param int $associate_id Associate user ID.
+	 * @param bool $allow_inactive Whether inactive associates are still allowed for access checks.
+	 * @return WP_User|WP_Error
+	 */
+	function pitblado_get_manageable_associate( $associate_id, $allow_inactive = false ) {
+		$associate_id = absint( $associate_id );
+
+		if ( ! $associate_id ) {
+			return new WP_Error( 'missing_associate', __( 'No associate selected.', 'pitblado' ) );
+		}
+
 		$associate = pitblado_get_associate_user( $associate_id );
 		if ( ! $associate ) {
 			return new WP_Error( 'invalid_associate', __( 'Associate not found.', 'pitblado' ) );
@@ -33,7 +53,12 @@ if ( ! function_exists( 'pitblado_resolve_requested_manageable_associate' ) ) {
 			return $associate;
 		}
 
-		if ( ! pitblado_current_user_can_manage_associate( $associate_id ) ) {
+		if ( ! $allow_inactive && pitblado_is_associate_inactive( $associate_id ) ) {
+			return new WP_Error( 'forbidden_associate', __( 'You do not have access to this associate.', 'pitblado' ) );
+		}
+
+		$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
+		if ( $assigned_director !== get_current_user_id() ) {
 			return new WP_Error( 'forbidden_associate', __( 'You do not have access to this associate.', 'pitblado' ) );
 		}
 
@@ -172,21 +197,7 @@ if ( ! function_exists( 'pitblado_current_user_can_manage_associate' ) ) {
 			return false;
 		}
 
-		if ( ! pitblado_get_associate_user( $associate_id ) ) {
-			return false;
-		}
-
-		if ( current_user_can( 'manage_options' ) ) {
-			return true;
-		}
-
-		if ( pitblado_is_associate_inactive( $associate_id ) ) {
-			return false;
-		}
-
-		$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
-
-		return $assigned_director === get_current_user_id();
+		return ! is_wp_error( pitblado_get_manageable_associate( $associate_id ) );
 	}
 }
 
@@ -198,17 +209,7 @@ if ( ! function_exists( 'pitblado_current_user_can_reactivate_associate' ) ) {
 			return false;
 		}
 
-		if ( ! pitblado_get_associate_user( $associate_id ) ) {
-			return false;
-		}
-
-		if ( current_user_can( 'manage_options' ) ) {
-			return true;
-		}
-
-		$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
-
-		return $assigned_director === get_current_user_id();
+		return ! is_wp_error( pitblado_get_manageable_associate( $associate_id, true ) );
 	}
 }
 
