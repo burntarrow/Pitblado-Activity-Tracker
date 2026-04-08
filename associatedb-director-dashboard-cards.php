@@ -155,7 +155,7 @@ add_shortcode( 'director_dashboard_range_selector', function() {
 		);
 	}
 
-	return '<div class="director-range-selector" role="group" aria-label="Director dashboard date range">' . implode( '', $links ) . '</div>';
+	return '<div class="director-range-selector" role="group" aria-label="Partner dashboard date range">' . implode( '', $links ) . '</div>';
 } );
 
 add_shortcode( 'director_relationship_type_chart', function() {
@@ -305,7 +305,7 @@ add_shortcode( 'director_users_no_plan', function() {
 				<td><a href="%s">View</a></td>
 			</tr>',
 			esc_html( $associate->display_name ),
-			esc_url( home_url( '/director/plans/' ) )
+			esc_url( home_url( '/partner/plans/' ) )
 		);
 	}
 
@@ -415,7 +415,7 @@ add_shortcode( 'director_users_no_activity_14_days', function() {
 			</tr>',
 			esc_html( $associate->display_name ),
 			esc_html( $last_activity ),
-			esc_url( home_url( '/director/activity/' ) )
+			esc_url( home_url( '/partner/activity/' ) )
 		);
 	}
 

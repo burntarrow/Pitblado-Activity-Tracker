@@ -1,8 +1,8 @@
 <?php
 /**
- * Purpose: Render /director/associates/ list with My/All scope toggle and KPI summary.
+ * Purpose: Render /partner/associates/ list with My/All scope toggle and KPI summary.
  * Shortcodes: [director_my_associates_page]
- * Target page: /director/associates/
+ * Target page: /partner/associates/
  */
 add_shortcode( 'director_my_associates_page', function() {
 	if ( ! is_user_logged_in() || ! class_exists( 'GFAPI' ) ) {
@@ -25,9 +25,9 @@ add_shortcode( 'director_my_associates_page', function() {
 	$first_stat_label      = 'mine' === $scope ? 'Assigned Associates' : 'Total Associates';
 	$scope_mine_button     = 'mine' === $scope ? 'director-primary-btn' : 'director-secondary-btn';
 	$scope_all_button      = 'all' === $scope ? 'director-primary-btn' : 'director-secondary-btn';
-	$scope_mine_url        = add_query_arg( 'scope', 'mine', home_url( '/director/associates/' ) );
-	$scope_all_url         = add_query_arg( 'scope', 'all', home_url( '/director/associates/' ) );
-	$inactive_url          = add_query_arg( 'scope', $scope, home_url( '/director/associates/inactive/' ) );
+	$scope_mine_url        = add_query_arg( 'scope', 'mine', home_url( '/partner/associates/' ) );
+	$scope_all_url         = add_query_arg( 'scope', 'all', home_url( '/partner/associates/' ) );
+	$inactive_url          = add_query_arg( 'scope', $scope, home_url( '/partner/associates/inactive/' ) );
 	$styles = function_exists( 'pitblado_get_director_shared_styles' ) ? pitblado_get_director_shared_styles() : '';
 
 	$empty_state_message   = 'mine' === $scope
@@ -44,7 +44,7 @@ add_shortcode( 'director_my_associates_page', function() {
 					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
 				</div>
 				<div class="director-overview-actions">
-					<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
+					<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>
 					<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
 				</div>
 			</div>
@@ -153,7 +153,7 @@ add_shortcode( 'director_my_associates_page', function() {
 			esc_html( $thirty_day ),
 			$plan_status === 'Submitted' ? 'is-submitted' : 'is-missing',
 			esc_html( $plan_status ),
-			esc_url( add_query_arg( 'associate_id', $user_id, home_url( '/director/associates/overview/' ) ) )
+			esc_url( add_query_arg( 'associate_id', $user_id, home_url( '/partner/associates/overview/' ) ) )
 		);
 	}
 
@@ -168,7 +168,7 @@ add_shortcode( 'director_my_associates_page', function() {
 					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
 				</div>
 				<div class="director-overview-actions">
-					<a class="director-primary-btn" href="' . esc_url( home_url( '/director/associates/add/' ) ) . '">Add Associate</a>
+					<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>
 					<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
 				</div>
 			</div>

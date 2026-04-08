@@ -5,7 +5,7 @@
  * Version: 1.1.0
  *
  * Shortcodes: [director_associate_activity_page]
- * Target page: /director/associates/activity/
+ * Target page: /partner/associates/activity/
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,8 +45,8 @@ add_shortcode( 'director_associate_activity_page', function() {
 		return $styles . '<div class="director-empty-state">' . esc_html( $associate->get_error_message() ) . '</div>';
 	}
 
-	$overview_url          = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/overview/' ) );
-	$associate_activity_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/activity/' ) );
+	$overview_url          = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/overview/' ) );
+	$associate_activity_url = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/activity/' ) );
 	$view_shortcode        = sprintf(
 		'[gravityview id="708" secret="f4726efa8f9c" search_field="created_by" search_operator="is" search_value="%d" page_size="15" sort_direction="DESC" back_link_label="← Back to Associate Activity"]',
 		$associate_id

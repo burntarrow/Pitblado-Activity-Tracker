@@ -43,7 +43,7 @@ add_action( 'template_redirect', function() {
 
 	delete_user_meta( $associate_id, 'associate_status' );
 
-	wp_safe_redirect( add_query_arg( 'reactivated', '1', home_url( '/director/associates/inactive/' ) ) );
+	wp_safe_redirect( add_query_arg( 'reactivated', '1', home_url( '/partner/associates/inactive/' ) ) );
 	exit;
 } );
 
@@ -78,7 +78,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 						<h1 class="director-page-title">Inactive Associates</h1>
 						<p class="director-page-subtitle">Review and reactivate previously deactivated associates.</p>
 					</div>
-					<a class="director-secondary-btn" href="' . esc_url( home_url( '/director/associates/' ) ) . '">Back to My Associates</a>
+					<a class="director-secondary-btn" href="' . esc_url( home_url( '/partner/associates/' ) ) . '">Back to My Associates</a>
 				</div>
 				<div class="director-empty-state">No inactive associates found.</div>
 			</div>
@@ -159,7 +159,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 				'associate_id'         => $user_id,
 				'reactivate_associate' => 1,
 			),
-			home_url( '/director/associates/inactive/' )
+			home_url( '/partner/associates/inactive/' )
 		);
 
 		$reactivate_url = wp_nonce_url( $reactivate_url, 'reactivate_associate_' . $user_id );
@@ -189,7 +189,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 						<h1 class="director-page-title">Inactive Associates</h1>
 						<p class="director-page-subtitle">Review and reactivate previously deactivated associates.</p>
 					</div>
-					<a class="director-secondary-btn" href="' . esc_url( home_url( '/director/associates/' ) ) . '">Back to My Associates</a>
+					<a class="director-secondary-btn" href="' . esc_url( home_url( '/partner/associates/' ) ) . '">Back to My Associates</a>
 				</div>
 				<div class="director-empty-state">No inactive associates found.</div>
 			</div>
@@ -204,7 +204,7 @@ add_shortcode( 'director_inactive_associates_page', function() {
 					<h1 class="director-page-title">Inactive Associates</h1>
 					<p class="director-page-subtitle">Review and reactivate previously deactivated associates.</p>
 				</div>
-				<a class="director-secondary-btn" href="' . esc_url( home_url( '/director/associates/' ) ) . '">Back to My Associates</a>
+				<a class="director-secondary-btn" href="' . esc_url( home_url( '/partner/associates/' ) ) . '">Back to My Associates</a>
 			</div>
 			<div class="director-associates-table-wrap">
 				<table class="director-associates-table">

@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: AssociateDB Director Assigned GravityView Filters
- * Description: Restricts /director/activity and /director/plans GravityView content to accessible associates and injects context panels.
+ * Description: Restricts /partner/activity and /partner/plans GravityView content to accessible associates and injects context panels.
  * Version: 1.1.0
  *
  * Shortcodes: none.
- * Target pages: /director/activity/, /director/plans/
+ * Target pages: /partner/activity/, /partner/plans/
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! function_exists( 'pitblado_is_director_activity_page_request' ) ) {
 			$path = '/';
 		}
 
-		return trailingslashit( $path ) === '/director/activity/';
+		return trailingslashit( $path ) === '/partner/activity/';
 	}
 }
 
@@ -30,16 +30,16 @@ if ( ! function_exists( 'pitblado_is_director_plans_page_request' ) ) {
 			$path = '/';
 		}
 
-		return trailingslashit( $path ) === '/director/plans/';
+		return trailingslashit( $path ) === '/partner/plans/';
 	}
 }
 
 if ( ! function_exists( 'pitblado_get_director_page_context_panel' ) ) {
 	function pitblado_get_director_page_context_panel( WP_User $associate, $mode ) {
 		$associate_id   = (int) $associate->ID;
-		$overview_url   = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/overview/' ) );
-		$activity_url   = home_url( '/director/activity/' );
-		$plans_url      = home_url( '/director/plans/' );
+		$overview_url   = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/overview/' ) );
+		$activity_url   = home_url( '/partner/activity/' );
+		$plans_url      = home_url( '/partner/plans/' );
 		$all_label      = 'plans' === $mode ? 'Back to All Plans' : 'Back to All Activity';
 		$all_url        = 'plans' === $mode ? $plans_url : $activity_url;
 		$focused_label  = 'plans' === $mode ? 'Associate Plan' : 'Associate Activity';
