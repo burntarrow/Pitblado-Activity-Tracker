@@ -22,7 +22,7 @@ if ( ! function_exists( 'pitblado_is_portal_page_request' ) ) {
 
 		$request_path = trailingslashit( $request_path );
 
-		return 0 === strpos( $request_path, '/director/' ) || 0 === strpos( $request_path, '/associate/' );
+		return 0 === strpos( $request_path, '/partner/' ) || 0 === strpos( $request_path, '/associate/' );
 	}
 }
 
