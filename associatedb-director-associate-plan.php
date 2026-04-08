@@ -22,8 +22,8 @@ add_shortcode( 'director_associate_plan_page', function() {
 		return $styles . '<div class="director-empty-state">' . esc_html( $associate->get_error_message() ) . '</div>';
 	}
 
-	$overview_url  = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/overview/' ) );
-	$all_plans_url = home_url( '/director/plans/' );
+	$overview_url  = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/overview/' ) );
+	$all_plans_url = home_url( '/partner/plans/' );
 	$view_shortcode = sprintf(
 		'[gravityview id="714" secret="8ea7768df2a0" search_field="created_by" search_operator="is" search_value="%d" page_size="1" sort_direction="DESC"]',
 		$associate_id

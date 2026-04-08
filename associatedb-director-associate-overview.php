@@ -54,7 +54,7 @@ add_action( 'template_redirect', function() {
 
 	update_user_meta( $associate_id, 'associate_status', 'inactive' );
 
-	wp_safe_redirect( add_query_arg( 'deactivated', '1', home_url( '/director/associates/' ) ) );
+	wp_safe_redirect( add_query_arg( 'deactivated', '1', home_url( '/partner/associates/' ) ) );
 	exit;
 } );
 
@@ -146,15 +146,15 @@ add_shortcode( 'director_associate_dashboard', function() {
 		$thirty_day    = rgar( $plan_entry, '36' ) !== '' ? absint( rgar( $plan_entry, '36' ) ) . '%' : '—';
 	}
 
-    $plans_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/plan/' ) );
-	$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/reassign/' ) );
+    $plans_url = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/plan/' ) );
+	$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/reassign/' ) );
 
 	$deactivate_url = add_query_arg(
 		array(
 			'associate_id'         => $associate_id,
 			'deactivate_associate' => 1,
 		),
-		home_url( '/director/associates/overview/' )
+		home_url( '/partner/associates/overview/' )
 	);
 
 	$deactivate_url = wp_nonce_url( $deactivate_url, 'deactivate_associate_' . $associate_id );
@@ -262,7 +262,7 @@ add_shortcode( 'director_associate_recent_activity', function() {
 				'associate_id' => $associate_id,
 				'entry'        => $entry_id,
 			),
-			home_url( '/director/associates/activity/' )
+			home_url( '/partner/associates/activity/' )
 		);
 
 		$rows[] = sprintf(
@@ -289,7 +289,7 @@ add_shortcode( 'director_associate_recent_activity', function() {
 					<div class="director-panel-title">Recent Activity</div>
 					<div class="director-panel-subtitle">Latest submissions for this associate.</div>
 				</div>
-				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/activity/' ) ) ) . '">View All Activity</a>
+				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/activity/' ) ) ) . '">View All Activity</a>
 			</div>
 			<div class="director-associates-table-wrap">
 				<table class="director-associates-table">
@@ -390,7 +390,7 @@ add_shortcode( 'director_associate_plan_snapshot', function() {
 					<div class="director-panel-title">Plan Snapshot</div>
 					<div class="director-panel-subtitle">Latest submitted accelerator plan.</div>
 				</div>
-				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/director/associates/plan/' ) ) ) . '">Open Full Plan</a>
+				<a class="director-panel-link" href="' . esc_url( add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/plan/' ) ) ) . '">Open Full Plan</a>
 			</div>
 
 			<div class="director-plan-grid director-plan-snapshot-grid">
