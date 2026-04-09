@@ -83,8 +83,8 @@ if ( ! function_exists( 'pitblado_director_dashboard_get_range_context' ) ) {
 
 if ( ! function_exists( 'pitblado_director_dashboard_get_associate_ids' ) ) {
 	function pitblado_director_dashboard_get_associate_ids() {
-		if ( is_user_logged_in() && ! current_user_can( 'manage_options' ) ) {
-			$associates = pitblado_get_active_associates_for_director( get_current_user_id() );
+		if ( is_user_logged_in() && function_exists( 'pitblado_current_user_is_global_admin' ) && ! pitblado_current_user_is_global_admin() ) {
+			$associates = pitblado_get_active_associates_for_partner( get_current_user_id() );
 		} else {
 			$associates = pitblado_get_all_active_associates();
 		}
