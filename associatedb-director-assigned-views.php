@@ -187,7 +187,7 @@ function adb_filter_entries_by_current_director( $entries, $view = null, $reques
 		}
 	}
 
-	if ( current_user_can( 'manage_options' ) && ! $associate_context ) {
+	if ( function_exists( 'pitblado_current_user_is_global_admin' ) && pitblado_current_user_is_global_admin() && ! $associate_context ) {
 		return $entries;
 	}
 
@@ -224,7 +224,7 @@ function adb_filter_entries_by_current_director( $entries, $view = null, $reques
 			continue;
 		}
 
-		if ( current_user_can( 'manage_options' ) ) {
+		if ( function_exists( 'pitblado_current_user_is_global_admin' ) && pitblado_current_user_is_global_admin() ) {
 			$return->add( $entry );
 			continue;
 		}

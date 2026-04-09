@@ -29,6 +29,49 @@ if ( ! function_exists( 'pitblado_resolve_requested_manageable_associate' ) ) {
 }
 
 
+
+if ( ! function_exists( 'pitblado_get_associate_owner_id' ) ) {
+	function pitblado_get_associate_owner_id( $associate_id ) {
+		$associate_id = absint( $associate_id );
+
+		if ( ! $associate_id ) {
+			return 0;
+		}
+
+		$assigned_partner = absint( get_user_meta( $associate_id, 'assigned_partner', true ) );
+		if ( $assigned_partner ) {
+			return $assigned_partner;
+		}
+
+		return absint( get_user_meta( $associate_id, 'assigned_director', true ) );
+	}
+}
+
+if ( ! function_exists( 'pitblado_current_user_is_partner' ) ) {
+	function pitblado_current_user_is_partner() {
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		$user = wp_get_current_user();
+		return $user instanceof WP_User && in_array( 'partner', (array) $user->roles, true );
+	}
+}
+
+if ( ! function_exists( 'pitblado_current_user_is_global_admin' ) ) {
+	function pitblado_current_user_is_global_admin() {
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		if ( pitblado_current_user_is_partner() ) {
+			return false;
+		}
+
+		return current_user_can( 'manage_options' );
+	}
+}
+
 if ( ! function_exists( 'pitblado_get_manageable_associate' ) ) {
 	/**
 	 * Resolve an associate and verify current user can manage that associate.
@@ -49,7 +92,7 @@ if ( ! function_exists( 'pitblado_get_manageable_associate' ) ) {
 			return new WP_Error( 'invalid_associate', __( 'Associate not found.', 'pitblado' ) );
 		}
 
-		if ( current_user_can( 'manage_options' ) ) {
+		if ( pitblado_current_user_is_global_admin() ) {
 			return $associate;
 		}
 
@@ -57,8 +100,8 @@ if ( ! function_exists( 'pitblado_get_manageable_associate' ) ) {
 			return new WP_Error( 'forbidden_associate', __( 'You do not have access to this associate.', 'pitblado' ) );
 		}
 
-		$assigned_director = absint( get_user_meta( $associate_id, 'assigned_director', true ) );
-		if ( $assigned_director !== get_current_user_id() ) {
+		$assigned_owner = pitblado_get_associate_owner_id( $associate_id );
+		if ( $assigned_owner !== get_current_user_id() ) {
 			return new WP_Error( 'forbidden_associate', __( 'You do not have access to this associate.', 'pitblado' ) );
 		}
 
@@ -88,11 +131,11 @@ if ( ! function_exists( 'pitblado_is_associate_inactive' ) ) {
 	}
 }
 
-if ( ! function_exists( 'pitblado_get_active_associates_for_director' ) ) {
-	function pitblado_get_active_associates_for_director( $director_id ) {
-		$director_id = absint( $director_id );
+if ( ! function_exists( 'pitblado_get_active_associates_for_partner' ) ) {
+	function pitblado_get_active_associates_for_partner( $partner_id ) {
+		$partner_id = absint( $partner_id );
 
-		if ( ! $director_id ) {
+		if ( ! $partner_id ) {
 			return array();
 		}
 
@@ -102,8 +145,15 @@ if ( ! function_exists( 'pitblado_get_active_associates_for_director' ) ) {
 				'meta_query' => array(
 					'relation' => 'AND',
 					array(
-						'key'   => 'assigned_director',
-						'value' => $director_id,
+						'relation' => 'OR',
+						array(
+							'key'   => 'assigned_partner',
+							'value' => $partner_id,
+						),
+						array(
+							'key'   => 'assigned_director',
+							'value' => $partner_id,
+						),
 					),
 					array(
 						'relation' => 'OR',
@@ -120,6 +170,12 @@ if ( ! function_exists( 'pitblado_get_active_associates_for_director' ) ) {
 				),
 			)
 		);
+	}
+}
+
+if ( ! function_exists( 'pitblado_get_active_associates_for_director' ) ) {
+	function pitblado_get_active_associates_for_director( $director_id ) {
+		return pitblado_get_active_associates_for_partner( $director_id );
 	}
 }
 
@@ -146,11 +202,11 @@ if ( ! function_exists( 'pitblado_get_all_active_associates' ) ) {
 	}
 }
 
-if ( ! function_exists( 'pitblado_get_inactive_associates_for_director' ) ) {
-	function pitblado_get_inactive_associates_for_director( $director_id ) {
-		$director_id = absint( $director_id );
+if ( ! function_exists( 'pitblado_get_inactive_associates_for_partner' ) ) {
+	function pitblado_get_inactive_associates_for_partner( $partner_id ) {
+		$partner_id = absint( $partner_id );
 
-		if ( ! $director_id ) {
+		if ( ! $partner_id ) {
 			return array();
 		}
 
@@ -160,8 +216,15 @@ if ( ! function_exists( 'pitblado_get_inactive_associates_for_director' ) ) {
 				'meta_query' => array(
 					'relation' => 'AND',
 					array(
-						'key'   => 'assigned_director',
-						'value' => $director_id,
+						'relation' => 'OR',
+						array(
+							'key'   => 'assigned_partner',
+							'value' => $partner_id,
+						),
+						array(
+							'key'   => 'assigned_director',
+							'value' => $partner_id,
+						),
 					),
 					array(
 						'key'   => 'associate_status',
@@ -170,6 +233,12 @@ if ( ! function_exists( 'pitblado_get_inactive_associates_for_director' ) ) {
 				),
 			)
 		);
+	}
+}
+
+if ( ! function_exists( 'pitblado_get_inactive_associates_for_director' ) ) {
+	function pitblado_get_inactive_associates_for_director( $director_id ) {
+		return pitblado_get_inactive_associates_for_partner( $director_id );
 	}
 }
 
