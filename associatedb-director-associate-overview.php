@@ -48,7 +48,7 @@ add_action( 'template_redirect', function() {
 		wp_die( 'Associate not found.' );
 	}
 
-	if ( ! pitblado_current_user_can_manage_associate( $associate_id ) ) {
+	if ( ! pitblado_current_user_is_global_admin() || ! pitblado_current_user_can_manage_associate( $associate_id ) ) {
 		wp_die( 'You do not have permission to deactivate this associate.' );
 	}
 
@@ -146,18 +146,22 @@ add_shortcode( 'director_associate_dashboard', function() {
 		$thirty_day    = rgar( $plan_entry, '36' ) !== '' ? absint( rgar( $plan_entry, '36' ) ) . '%' : '—';
 	}
 
-    $plans_url = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/plan/' ) );
-	$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/reassign/' ) );
+	$plans_url          = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/plan/' ) );
+	$show_admin_actions = pitblado_current_user_is_global_admin();
 
-	$deactivate_url = add_query_arg(
-		array(
-			'associate_id'         => $associate_id,
-			'deactivate_associate' => 1,
-		),
-		home_url( '/partner/associates/overview/' )
-	);
+	if ( $show_admin_actions ) {
+		$reassign_url = add_query_arg( 'associate_id', $associate_id, home_url( '/partner/associates/reassign/' ) );
 
-	$deactivate_url = wp_nonce_url( $deactivate_url, 'deactivate_associate_' . $associate_id );
+		$deactivate_url = add_query_arg(
+			array(
+				'associate_id'         => $associate_id,
+				'deactivate_associate' => 1,
+			),
+			home_url( '/partner/associates/overview/' )
+		);
+
+		$deactivate_url = wp_nonce_url( $deactivate_url, 'deactivate_associate_' . $associate_id );
+	}
 
 	ob_start();
 	?>
@@ -170,8 +174,10 @@ add_shortcode( 'director_associate_dashboard', function() {
 			</div>
 			<div class="director-overview-actions">
 				<a class="director-secondary-btn" href="<?php echo esc_url( $plans_url ); ?>">View Plan</a>
-				<a class="director-secondary-btn" href="<?php echo esc_url( $reassign_url ); ?>">Reassign</a>
-				<a class="director-danger-btn" href="<?php echo esc_url( $deactivate_url ); ?>" onclick="return confirm('Deactivate this associate? They will no longer be able to log in.');">Deactivate</a>
+				<?php if ( $show_admin_actions ) : ?>
+					<a class="director-secondary-btn" href="<?php echo esc_url( $reassign_url ); ?>">Reassign</a>
+					<a class="director-danger-btn" href="<?php echo esc_url( $deactivate_url ); ?>" onclick="return confirm('Deactivate this associate? They will no longer be able to log in.');">Deactivate</a>
+				<?php endif; ?>
 			</div>
 		</div>
 
