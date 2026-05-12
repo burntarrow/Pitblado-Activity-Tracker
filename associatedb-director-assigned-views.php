@@ -34,6 +34,92 @@ if ( ! function_exists( 'pitblado_is_director_plans_page_request' ) ) {
 	}
 }
 
+
+if ( ! function_exists( 'pitblado_get_current_director_associate_ids' ) ) {
+	/**
+	 * Get active associate user IDs that are currently assigned to the logged-in partner/director.
+	 *
+	 * This intentionally reads the current associate user meta relationship instead of any
+	 * Gravity Forms helper field that may have been captured at submission time.
+	 *
+	 * @return int[]
+	 */
+	function pitblado_get_current_director_associate_ids() {
+		if ( ! is_user_logged_in() ) {
+			return array();
+		}
+
+		$associates = pitblado_get_active_associates_for_director( get_current_user_id() );
+		if ( empty( $associates ) ) {
+			return array();
+		}
+
+		return array_values( array_unique( array_map( 'intval', wp_list_pluck( $associates, 'ID' ) ) ) );
+	}
+}
+
+if ( ! function_exists( 'pitblado_entry_associate_user_id' ) ) {
+	/**
+	 * Resolve the associate user ID represented by a Gravity Forms/GravityView entry.
+	 *
+	 * Form 1 and Form 4 entries are owned by the associate via created_by. Forms 12 and 34
+	 * are supported for existing migrated/helper views that store the associate in hidden
+	 * fields 25 and 90 respectively.
+	 *
+	 * @param array|ArrayAccess $entry GravityView entry object/array.
+	 * @return int
+	 */
+	function pitblado_entry_associate_user_id( $entry ) {
+		$form_id = absint( $entry['form_id'] ?? ( $entry->form_id ?? 0 ) );
+
+		if ( 12 === $form_id ) {
+			return absint( $entry['25'] ?? 0 );
+		}
+
+		if ( 34 === $form_id ) {
+			return absint( $entry['90'] ?? 0 );
+		}
+
+		return absint( $entry['created_by'] ?? 0 );
+	}
+}
+
+if ( ! function_exists( 'pitblado_render_gravityview_shortcode_without_stale_director_filters' ) ) {
+	/**
+	 * Re-render partner Activity/Plans GravityView shortcodes without stale shortcode filters.
+	 *
+	 * Partner-facing aggregate views are filtered after GravityView loads entries by checking
+	 * the current associate assignment relationship. Shortcode-level filters such as
+	 * search_field="23" search_value="{user:ID}" can exclude valid currently assigned
+	 * associates before that current-assignment check runs, so they are removed here.
+	 *
+	 * @param array $attr GravityView shortcode attributes.
+	 * @return string
+	 */
+	function pitblado_render_gravityview_shortcode_without_stale_director_filters( $attr ) {
+		$attr = is_array( $attr ) ? $attr : array();
+
+		foreach ( array( 'search_field', 'search_operator', 'search_value' ) as $stale_filter_attr ) {
+			unset( $attr[ $stale_filter_attr ] );
+		}
+
+		$parts = array();
+		foreach ( $attr as $key => $value ) {
+			if ( is_int( $key ) || is_array( $value ) || is_object( $value ) ) {
+				continue;
+			}
+
+			$parts[] = sanitize_key( $key ) . '="' . esc_attr( (string) $value ) . '"';
+		}
+
+		$GLOBALS['pitblado_rendering_current_assignment_gravityview'] = true;
+		$output = do_shortcode( '[gravityview ' . implode( ' ', $parts ) . ']' );
+		unset( $GLOBALS['pitblado_rendering_current_assignment_gravityview'] );
+
+		return $output;
+	}
+}
+
 if ( ! function_exists( 'pitblado_get_director_page_context_panel' ) ) {
 	function pitblado_get_director_page_context_panel( WP_User $associate, $mode ) {
 		$associate_id   = (int) $associate->ID;
@@ -159,11 +245,41 @@ if ( ! function_exists( 'pitblado_render_director_associate_plan_focus' ) ) {
 	}
 }
 
+add_filter( 'pre_do_shortcode_tag', 'pitblado_strip_stale_director_gravityview_shortcode_filters', 10, 4 );
+function pitblado_strip_stale_director_gravityview_shortcode_filters( $return, $tag, $attr, $m ) {
+	if ( 'gravityview' !== $tag || ! is_user_logged_in() ) {
+		return $return;
+	}
+
+	if ( ! empty( $GLOBALS['pitblado_rendering_current_assignment_gravityview'] ) ) {
+		return $return;
+	}
+
+	$is_director_assignment_page = pitblado_is_director_activity_page_request() || pitblado_is_director_plans_page_request();
+	if ( ! $is_director_assignment_page ) {
+		return $return;
+	}
+
+	if ( function_exists( 'pitblado_current_user_is_global_admin' ) && pitblado_current_user_is_global_admin() && empty( $_GET['associate_id'] ) ) {
+		return $return;
+	}
+
+	$attr = is_array( $attr ) ? $attr : array();
+	if ( ! isset( $attr['search_field'], $attr['search_value'] ) ) {
+		return $return;
+	}
+
+	return pitblado_render_gravityview_shortcode_without_stale_director_filters( $attr );
+}
+
 add_filter( 'gravityview/view/entries', 'adb_filter_entries_by_current_director', 10, 3 );
 function adb_filter_entries_by_current_director( $entries, $view = null, $request = null ) {
-	$target_view_ids = array( 101, 102 );
+	$target_view_ids = array( 101, 102, 528, 708, 714 );
+	$view_id         = $view && isset( $view->ID ) ? (int) $view->ID : 0;
+	$is_activity_page = pitblado_is_director_activity_page_request();
+	$is_plans_page    = pitblado_is_director_plans_page_request();
 
-	if ( ! $view || ! in_array( (int) $view->ID, $target_view_ids, true ) ) {
+	if ( ! ( $is_activity_page || $is_plans_page || in_array( $view_id, $target_view_ids, true ) ) ) {
 		return $entries;
 	}
 
@@ -175,8 +291,6 @@ function adb_filter_entries_by_current_director( $entries, $view = null, $reques
 		return $entries;
 	}
 
-	$is_activity_page  = pitblado_is_director_activity_page_request();
-	$is_plans_page     = pitblado_is_director_plans_page_request();
 	$requested_entry   = isset( $_GET['entry'] ) ? absint( $_GET['entry'] ) : 0;
 	$associate_context = null;
 
@@ -191,29 +305,22 @@ function adb_filter_entries_by_current_director( $entries, $view = null, $reques
 		return $entries;
 	}
 
+	$allowed_associate_ids = array();
+	if ( ! $associate_context ) {
+		$allowed_associate_ids = pitblado_get_current_director_associate_ids();
+		if ( empty( $allowed_associate_ids ) ) {
+			return new \GV\Entry_Collection();
+		}
+	}
+
 	$return = new \GV\Entry_Collection();
 
 	foreach ( $entries->all() as $entry ) {
-		$form_id = (int) $entry->form_id;
+		$associate_user_id = pitblado_entry_associate_user_id( $entry );
 
 		if ( $associate_context instanceof WP_User ) {
-			$associate_id = (int) $associate_context->ID;
-			$entry_owner  = absint( $entry['created_by'] ?? 0 );
-
-			if ( $entry_owner && $entry_owner !== $associate_id ) {
+			if ( $associate_user_id && $associate_user_id !== (int) $associate_context->ID ) {
 				continue;
-			}
-
-			if ( 12 === $form_id ) {
-				$entry_associate = absint( $entry['25'] ?? 0 );
-				if ( $entry_associate && $entry_associate !== $associate_id ) {
-					continue;
-				}
-			} elseif ( 34 === $form_id ) {
-				$entry_associate = absint( $entry['90'] ?? 0 );
-				if ( $entry_associate && $entry_associate !== $associate_id ) {
-					continue;
-				}
 			}
 
 			if ( $is_activity_page && $requested_entry > 0 && (int) $entry->ID !== $requested_entry ) {
@@ -224,26 +331,11 @@ function adb_filter_entries_by_current_director( $entries, $view = null, $reques
 			continue;
 		}
 
-		if ( function_exists( 'pitblado_current_user_is_global_admin' ) && pitblado_current_user_is_global_admin() ) {
-			$return->add( $entry );
+		if ( ! $associate_user_id || ! in_array( $associate_user_id, $allowed_associate_ids, true ) ) {
 			continue;
 		}
 
-		if ( 12 === $form_id ) {
-			$associate_user_id = absint( $entry['25'] ?? 0 );
-		} elseif ( 34 === $form_id ) {
-			$associate_user_id = absint( $entry['90'] ?? 0 );
-		} else {
-			$associate_user_id = absint( $entry['created_by'] ?? 0 );
-		}
-
-		if ( ! $associate_user_id ) {
-			continue;
-		}
-
-		if ( pitblado_current_user_can_manage_associate( $associate_user_id ) ) {
-			$return->add( $entry );
-		}
+		$return->add( $entry );
 	}
 
 	return $return;

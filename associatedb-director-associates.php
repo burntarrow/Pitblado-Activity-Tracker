@@ -9,9 +9,11 @@ add_shortcode( 'director_my_associates_page', function() {
 		return '';
 	}
 
-	$director_id = get_current_user_id();
-	$scope       = isset( $_GET['scope'] ) ? sanitize_key( wp_unslash( $_GET['scope'] ) ) : 'all';
-	$scope       = in_array( $scope, array( 'mine', 'all' ), true ) ? $scope : 'all';
+	$director_id           = get_current_user_id();
+	$can_view_all_scope    = function_exists( 'pitblado_current_user_is_global_admin' ) ? pitblado_current_user_is_global_admin() : current_user_can( 'manage_options' );
+	$requested_scope       = isset( $_GET['scope'] ) ? sanitize_key( wp_unslash( $_GET['scope'] ) ) : ( $can_view_all_scope ? 'all' : 'mine' );
+	$requested_scope       = in_array( $requested_scope, array( 'mine', 'all' ), true ) ? $requested_scope : ( $can_view_all_scope ? 'all' : 'mine' );
+	$scope                 = ( 'all' === $requested_scope && ! $can_view_all_scope ) ? 'mine' : $requested_scope;
 
 	$success_notice = '';
 	if ( isset( $_GET['deactivated'] ) && $_GET['deactivated'] === '1' ) {
@@ -27,6 +29,10 @@ add_shortcode( 'director_my_associates_page', function() {
 	$scope_all_button      = 'all' === $scope ? 'director-primary-btn' : 'director-secondary-btn';
 	$scope_mine_url        = add_query_arg( 'scope', 'mine', home_url( '/partner/associates/' ) );
 	$scope_all_url         = add_query_arg( 'scope', 'all', home_url( '/partner/associates/' ) );
+	$scope_controls        = '<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>';
+	if ( $can_view_all_scope ) {
+		$scope_controls .= '<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>';
+	}
 	$inactive_url          = add_query_arg( 'scope', $scope, home_url( '/partner/associates/inactive/' ) );
 	$styles = function_exists( 'pitblado_get_director_shared_styles' ) ? pitblado_get_director_shared_styles() : '';
 
@@ -40,8 +46,7 @@ add_shortcode( 'director_my_associates_page', function() {
 			' . $success_notice . '
 			<div class="director-page-header-row">
 				<div class="director-overview-actions">
-					<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
-					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+					' . $scope_controls . '
 				</div>
 				<div class="director-overview-actions">
 					<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>
@@ -164,8 +169,7 @@ add_shortcode( 'director_my_associates_page', function() {
 
 			<div class="director-page-header-row">
 				<div class="director-overview-actions">
-					<a class="' . esc_attr( $scope_mine_button ) . '" href="' . esc_url( $scope_mine_url ) . '">My Associates</a>
-					<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>
+					' . $scope_controls . '
 				</div>
 				<div class="director-overview-actions">
 					<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>
