@@ -33,7 +33,14 @@ add_shortcode( 'director_my_associates_page', function() {
 	if ( $can_view_all_scope ) {
 		$scope_controls .= '<a class="' . esc_attr( $scope_all_button ) . '" href="' . esc_url( $scope_all_url ) . '">All Associates</a>';
 	}
-	$inactive_url          = add_query_arg( 'scope', $scope, home_url( '/partner/associates/inactive/' ) );
+	$admin_associate_actions = '';
+	if ( $can_view_all_scope ) {
+		$inactive_url            = add_query_arg( 'scope', $scope, home_url( '/partner/associates/inactive/' ) );
+		$admin_associate_actions = '<div class="director-overview-actions">'
+			. '<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>'
+			. '<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>'
+			. '</div>';
+	}
 	$styles = function_exists( 'pitblado_get_director_shared_styles' ) ? pitblado_get_director_shared_styles() : '';
 
 	$empty_state_message   = 'mine' === $scope
@@ -48,10 +55,7 @@ add_shortcode( 'director_my_associates_page', function() {
 				<div class="director-overview-actions">
 					' . $scope_controls . '
 				</div>
-				<div class="director-overview-actions">
-					<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>
-					<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
-				</div>
+				' . $admin_associate_actions . '
 			</div>
 			<div class="director-empty-state">' . esc_html( $empty_state_message ) . '</div>
 		</div>
@@ -171,10 +175,7 @@ add_shortcode( 'director_my_associates_page', function() {
 				<div class="director-overview-actions">
 					' . $scope_controls . '
 				</div>
-				<div class="director-overview-actions">
-					<a class="director-primary-btn" href="' . esc_url( home_url( '/partner/associates/add/' ) ) . '">Add Associate</a>
-					<a class="director-secondary-btn" href="' . esc_url( $inactive_url ) . '">View Inactive Associates</a>
-				</div>
+				' . $admin_associate_actions . '
 			</div>
 
 			<div class="director-mini-stats">
